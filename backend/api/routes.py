@@ -5,10 +5,10 @@ from flask import Flask, Blueprint
 from backend.api.auth import auth_bp
 from backend.api.keys import keys_bp
 from backend.api.files import files_bp
+from backend.api.scan import scan_bp
 
 # Create blueprints for different API sections
 main_bp = Blueprint('main', __name__)
-scan_bp = Blueprint('scan', __name__, url_prefix='/api/scan')
 
 @main_bp.route('/')
 def index():

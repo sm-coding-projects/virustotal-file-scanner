@@ -4,10 +4,12 @@ File upload and management API for the VirusTotal File Scanner application.
 import os
 import hashlib
 import uuid
+import re
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
-from backend.models.database import db, File, User
+from backend.models.database import db, File, User, ApiKey
+from backend.utils.security import sanitize_input, validate_uuid, rate_limit, validate_content_type
 
 # Create blueprint for file operations
 files_bp = Blueprint('files', __name__, url_prefix='/api/files')
@@ -54,6 +56,8 @@ def calculate_file_hashes(file_path):
 
 @files_bp.route('/upload', methods=['POST'])
 @jwt_required()
+@rate_limit(requests_per_minute=10)  # Limit file uploads to 10 per minute
+@validate_content_type('multipart/form-data')
 def upload_file():
     """
     Upload a file for scanning.
@@ -115,8 +119,11 @@ def upload_file():
         db.session.add(new_file)
         db.session.commit()
         
-        # Return file information
-        return jsonify({
+        # Get user's active API key for automatic scanning
+        api_key = ApiKey.query.filter_by(user_id=user.id, is_active=True).first()
+        
+        # Prepare response data
+        response_data = {
             'id': str(new_file.id),
             'filename': new_file.filename,
             'file_size': new_file.file_size,
@@ -125,7 +132,110 @@ def upload_file():
             'hash_sha1': new_file.hash_sha1,
             'hash_sha256': new_file.hash_sha256,
             'upload_date': new_file.upload_date.isoformat()
-        }), 201
+        }
+        
+        # Automatically initiate a scan if an API key is available
+        if api_key:
+            try:
+                # Import here to avoid circular imports
+                from backend.models.database import Scan, ScanStatus
+                from backend.services.virustotal import VirusTotalService
+                
+                # Create a new scan record
+                new_scan = Scan(
+                    file_id=new_file.id,
+                    api_key_id=api_key.id,
+                    status=ScanStatus.PENDING
+                )
+                
+                db.session.add(new_scan)
+                db.session.commit()
+                
+                # Initialize VirusTotal service with the API key
+                vt_service = VirusTotalService(api_key.key_value)
+                
+                # Update scan status to scanning
+                new_scan.status = ScanStatus.SCANNING
+                db.session.commit()
+                
+                # Try to get existing report by hash first
+                success, error, report_data = vt_service.get_file_report_by_hash(new_file.hash_sha256)
+                
+                if success:
+                    # Request a fresh analysis
+                    rescan_success, rescan_error, rescan_data = vt_service.rescan_file(new_file.hash_sha256)
+                    
+                    if rescan_success:
+                        # Get the analysis ID
+                        analysis_id = rescan_data.get('data', {}).get('id')
+                        if analysis_id:
+                            new_scan.vt_scan_id = analysis_id
+                            db.session.commit()
+                            
+                            response_data['scan'] = {
+                                'scan_id': str(new_scan.id),
+                                'status': new_scan.status.value,
+                                'message': 'Scan initiated automatically'
+                            }
+                        else:
+                            new_scan.status = ScanStatus.FAILED
+                            db.session.commit()
+                            response_data['scan'] = {
+                                'error': 'Failed to get analysis ID from VirusTotal',
+                                'status': 'failed'
+                            }
+                    else:
+                        new_scan.status = ScanStatus.FAILED
+                        db.session.commit()
+                        response_data['scan'] = {
+                            'error': f'Failed to rescan file: {rescan_error}',
+                            'status': 'failed'
+                        }
+                else:
+                    # Upload the file to VirusTotal
+                    scan_success, scan_error, scan_data = vt_service.scan_file(new_file.storage_path)
+                    
+                    if scan_success:
+                        # Get the analysis ID
+                        analysis_id = scan_data.get('data', {}).get('id')
+                        if analysis_id:
+                            new_scan.vt_scan_id = analysis_id
+                            db.session.commit()
+                            
+                            response_data['scan'] = {
+                                'scan_id': str(new_scan.id),
+                                'status': new_scan.status.value,
+                                'message': 'Scan initiated automatically'
+                            }
+                        else:
+                            new_scan.status = ScanStatus.FAILED
+                            db.session.commit()
+                            response_data['scan'] = {
+                                'error': 'Failed to get analysis ID from VirusTotal',
+                                'status': 'failed'
+                            }
+                    else:
+                        new_scan.status = ScanStatus.FAILED
+                        db.session.commit()
+                        response_data['scan'] = {
+                            'error': f'Failed to scan file: {scan_error}',
+                            'status': 'failed'
+                        }
+            except Exception as e:
+                current_app.logger.error(f"Error initiating automatic scan: {str(e)}")
+                response_data['scan'] = {
+                    'error': 'Failed to initiate automatic scan',
+                    'message': str(e),
+                    'status': 'failed'
+                }
+        else:
+            response_data['scan'] = {
+                'message': 'No active API key found for automatic scanning',
+                'status': 'pending'
+            }
+        
+        # Return file information with scan status
+        return jsonify(response_data), 201
         
     except Exception as e:
         current_app.logger.error(f"Error uploading file: {str(e)}")
@@ -133,6 +243,7 @@ def upload_file():
 
 @files_bp.route('/', methods=['GET'])
 @jwt_required()
+@rate_limit(requests_per_minute=30)  # Limit file listing to 30 requests per minute
 def get_files():
     """
     Get a list of files uploaded by the current user.
@@ -167,6 +278,7 @@ def get_files():
 
 @files_bp.route('/<file_id>', methods=['GET'])
 @jwt_required()
+@rate_limit(requests_per_minute=30)
 def get_file(file_id):
     """
     Get information about a specific file.
@@ -207,6 +319,7 @@ def get_file(file_id):
 
 @files_bp.route('/<file_id>', methods=['DELETE'])
 @jwt_required()
+@rate_limit(requests_per_minute=10)
 def delete_file(file_id):
     """
     Delete a file.
@@ -217,6 +330,9 @@ def delete_file(file_id):
     Returns:
         JSON response indicating success or failure
     """
+    # Validate UUID format
+    if not validate_uuid(file_id):
+        return jsonify({'error': 'Invalid file ID format'}), 400
     try:
         # Get current user
         current_user_id = get_jwt_identity()
