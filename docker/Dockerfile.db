@@ -1,0 +1,15 @@
+# Dockerfile for PostgreSQL database
+FROM postgres:14-alpine
+
+# Add initialization scripts if needed
+COPY docker/init-db.sql /docker-entrypoint-initdb.d/
+
+# Set recommended PostgreSQL configurations
+RUN echo "max_connections = 100" >> /usr/local/share/postgresql/postgresql.conf.sample && \
+    echo "shared_buffers = 128MB" >> /usr/local/share/postgresql/postgresql.conf.sample && \
+    echo "effective_cache_size = 512MB" >> /usr/local/share/postgresql/postgresql.conf.sample && \
+    echo "work_mem = 4MB" >> /usr/local/share/postgresql/postgresql.conf.sample && \
+    echo "maintenance_work_mem = 64MB" >> /usr/local/share/postgresql/postgresql.conf.sample
+
+# Expose PostgreSQL port
+EXPOSE 5432
