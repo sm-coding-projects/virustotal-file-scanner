@@ -124,6 +124,22 @@ const ScanResultsPage: React.FC = () => {
     setFilteredResults(sortedResults);
   };
 
+  // Handle keyboard sorting
+  const handleSortKeyDown = (event: React.KeyboardEvent, key: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleSort(key);
+    }
+  };
+
+  // Get sort direction for ARIA
+  const getSortDirection = (key: string): 'ascending' | 'descending' | 'none' => {
+    if (sortConfig.key !== key) {
+      return 'none';
+    }
+    return sortConfig.direction === 'asc' ? 'ascending' : 'descending';
+  };
+
   // Get sort icon based on current sort config
   const getSortIcon = (key: string) => {
     if (sortConfig.key !== key) {
@@ -322,15 +338,19 @@ const ScanResultsPage: React.FC = () => {
       </p>
       
       {fileInfo && (
-        <div className="file-info">
-          <h2>{fileInfo.filename}</h2>
-          <p>Size: {formatFileSize(fileInfo.file_size)}</p>
-          <p>Hash (SHA-256): {fileInfo.hash_sha256}</p>
-        </div>
+        <section className="file-info" aria-labelledby="file-info-heading">
+          <h2 id="file-info-heading">{fileInfo.filename}</h2>
+          <dl>
+            <dt>Size:</dt>
+            <dd>{formatFileSize(fileInfo.file_size)}</dd>
+            <dt>Hash (SHA-256):</dt>
+            <dd className="hash-value">{fileInfo.hash_sha256}</dd>
+          </dl>
+        </section>
       )}
       
       {error && (
-        <div className="alert alert-danger" role="alert">
+        <div className="alert alert-danger" role="alert" aria-live="polite">
           {error}
         </div>
       )}
@@ -411,20 +431,42 @@ const ScanResultsPage: React.FC = () => {
             ) : displayedResults.length === 0 ? (
               <div className="no-results">No scan results found.</div>
             ) : (
-              <table className="table">
+              <table className="table" role="table" aria-label="Scan results">
                 <thead>
                   <tr>
-                    <th onClick={() => handleSort('filename')}>
-                      Filename <span className="sort-icon">{getSortIcon('filename')}</span>
+                    <th 
+                      role="columnheader"
+                      tabIndex={0}
+                      onClick={() => handleSort('filename')}
+                      onKeyDown={(e) => handleSortKeyDown(e, 'filename')}
+                      aria-sort={getSortDirection('filename')}
+                      aria-label={`Sort by filename ${getSortDirection('filename') === 'none' ? '' : getSortDirection('filename')}`}
+                    >
+                      Filename <span className="sort-icon" aria-hidden="true">{getSortIcon('filename')}</span>
                     </th>
-                    <th onClick={() => handleSort('scan_date')} className="mobile-hidden">
-                      Scan Date <span className="sort-icon">{getSortIcon('scan_date')}</span>
+                    <th 
+                      role="columnheader"
+                      tabIndex={0}
+                      onClick={() => handleSort('scan_date')} 
+                      onKeyDown={(e) => handleSortKeyDown(e, 'scan_date')}
+                      className="mobile-hidden"
+                      aria-sort={getSortDirection('scan_date')}
+                      aria-label={`Sort by scan date ${getSortDirection('scan_date') === 'none' ? '' : getSortDirection('scan_date')}`}
+                    >
+                      Scan Date <span className="sort-icon" aria-hidden="true">{getSortIcon('scan_date')}</span>
                     </th>
-                    <th onClick={() => handleSort('detection_ratio')}>
-                      Detection Ratio <span className="sort-icon">{getSortIcon('detection_ratio')}</span>
+                    <th 
+                      role="columnheader"
+                      tabIndex={0}
+                      onClick={() => handleSort('detection_ratio')}
+                      onKeyDown={(e) => handleSortKeyDown(e, 'detection_ratio')}
+                      aria-sort={getSortDirection('detection_ratio')}
+                      aria-label={`Sort by detection ratio ${getSortDirection('detection_ratio') === 'none' ? '' : getSortDirection('detection_ratio')}`}
+                    >
+                      Detection Ratio <span className="sort-icon" aria-hidden="true">{getSortIcon('detection_ratio')}</span>
                     </th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th role="columnheader">Status</th>
+                    <th role="columnheader">Actions</th>
                   </tr>
                 </thead>
                 <tbody>

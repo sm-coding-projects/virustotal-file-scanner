@@ -207,10 +207,22 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         onClick={openFileDialog}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openFileDialog();
+          }
+        }}
+        aria-label="File upload area. Click or press Enter to select files, or drag and drop files here"
+        aria-describedby="upload-instructions"
       >
         <div className="file-drop-content">
-          <i className="file-icon">{isDragging ? '📥' : '📁'}</i>
-          <p>{isDragging ? 'Drop files here to upload' : 'Drag and drop files here, or click to select files'}</p>
+          <i className="file-icon" aria-hidden="true">{isDragging ? '📥' : '📁'}</i>
+          <p id="upload-instructions">
+            {isDragging ? 'Drop files here to upload' : 'Drag and drop files here, or click to select files'}
+          </p>
           <input 
             type="file" 
             className="file-input" 
@@ -218,6 +230,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             onChange={handleFileSelect}
             multiple
             aria-label="File upload input"
+            tabIndex={-1}
           />
         </div>
       </div>

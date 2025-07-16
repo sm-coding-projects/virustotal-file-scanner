@@ -216,12 +216,13 @@ const ApiKeysPage: React.FC = () => {
       </p>
       
       {alert && (
-        <div className={`alert alert-${alert.type}`}>
+        <div className={`alert alert-${alert.type}`} role="alert" aria-live="polite">
           {alert.message}
           <button 
             type="button" 
             className="close" 
             onClick={dismissAlert}
+            aria-label="Dismiss alert"
             style={{ float: 'right', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             &times;
@@ -229,12 +230,12 @@ const ApiKeysPage: React.FC = () => {
         </div>
       )}
       
-      <div className="card">
+      <section className="card" aria-labelledby="add-key-heading">
         <div className="card-header">
-          <h2>{editingKey ? 'Edit API Key' : 'Add New API Key'}</h2>
+          <h2 id="add-key-heading">{editingKey ? 'Edit API Key' : 'Add New API Key'}</h2>
         </div>
         <div className="card-body">
-          <form className="api-key-form" onSubmit={handleSubmit}>
+          <form className="api-key-form" onSubmit={handleSubmit} noValidate>
             <div className="form-group">
               <label htmlFor="keyName">Key Name</label>
               <input 
@@ -245,8 +246,17 @@ const ApiKeysPage: React.FC = () => {
                 value={keyName}
                 onChange={(e) => setKeyName(e.target.value)}
                 required
+                aria-describedby={errors.keyName ? "keyName-error" : "keyName-help"}
+                aria-invalid={errors.keyName ? "true" : "false"}
               />
-              {errors.keyName && <div className="form-error">{errors.keyName}</div>}
+              <div id="keyName-help" className="form-text">
+                Choose a descriptive name to identify this API key
+              </div>
+              {errors.keyName && (
+                <div id="keyName-error" className="form-error" role="alert">
+                  {errors.keyName}
+                </div>
+              )}
             </div>
             
             <div className="form-group">
@@ -259,11 +269,17 @@ const ApiKeysPage: React.FC = () => {
                 value={keyValue}
                 onChange={(e) => setKeyValue(e.target.value)}
                 required={!editingKey}
+                aria-describedby={errors.keyValue ? "apiKey-error" : "apiKey-help"}
+                aria-invalid={errors.keyValue ? "true" : "false"}
               />
-              {errors.keyValue && <div className="form-error">{errors.keyValue}</div>}
-              <small className="form-text text-muted">
+              <div id="apiKey-help" className="form-text">
                 You can get your VirusTotal API key from your VirusTotal account settings.
-              </small>
+              </div>
+              {errors.keyValue && (
+                <div id="apiKey-error" className="form-error" role="alert">
+                  {errors.keyValue}
+                </div>
+              )}
             </div>
             
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -271,6 +287,8 @@ const ApiKeysPage: React.FC = () => {
                 type="submit" 
                 className="btn btn-primary"
                 disabled={validating}
+                aria-busy={validating}
+                aria-describedby="validation-status"
               >
                 {validating ? 'Validating...' : editingKey ? 'Update API Key' : 'Add API Key'}
               </button>
@@ -280,43 +298,54 @@ const ApiKeysPage: React.FC = () => {
                   type="button" 
                   className="btn btn-secondary"
                   onClick={handleCancelEdit}
+                  aria-label="Cancel editing API key"
                 >
                   Cancel
                 </button>
               )}
             </div>
+            
+            <div id="validation-status" className="sr-only" aria-live="polite">
+              {validating ? 'Validating API key, please wait...' : ''}
+            </div>
           </form>
         </div>
-      </div>
+      </section>
       
-      <div className="api-keys-list">
-        <h2>Your API Keys</h2>
+      <section className="api-keys-list" aria-labelledby="keys-list-heading">
+        <h2 id="keys-list-heading">Your API Keys</h2>
         
         {loading ? (
-          <div className="loading-spinner">Loading...</div>
+          <div className="loading-spinner" role="status" aria-live="polite">
+            <span className="sr-only">Loading API keys...</span>
+            Loading...
+          </div>
         ) : apiKeys.length === 0 ? (
-          <div className="empty-state">
+          <div className="empty-state" role="status">
             <p>No API keys found. Add a key above to get started.</p>
           </div>
         ) : (
           <div className="api-key-table-container">
-            <table className="table">
+            <table className="table" role="table" aria-label="API Keys">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Key (masked)</th>
-                  <th>Status</th>
-                  <th className="mobile-hidden">Created</th>
-                  <th>Actions</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Key (masked)</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" className="mobile-hidden">Created</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {apiKeys.map((key) => (
                   <tr key={key.id}>
-                    <td>{key.name}</td>
+                    <th scope="row">{key.name}</th>
                     <td className="key-masked">{maskApiKey('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')}</td>
                     <td>
-                      <span className={`badge ${key.is_active ? 'badge-success' : 'badge-danger'}`}>
+                      <span 
+                        className={`badge ${key.is_active ? 'badge-success' : 'badge-danger'}`}
+                        aria-label={`Status: ${key.is_active ? 'Active' : 'Inactive'}`}
+                      >
                         {key.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
@@ -325,18 +354,21 @@ const ApiKeysPage: React.FC = () => {
                       <button 
                         className="btn btn-sm btn-secondary"
                         onClick={() => handleEdit(key)}
+                        aria-label={`Edit API key ${key.name}`}
                       >
                         Edit
                       </button>
                       <button 
                         className="btn btn-sm btn-secondary"
                         onClick={() => handleToggleStatus(key)}
+                        aria-label={`${key.is_active ? 'Disable' : 'Enable'} API key ${key.name}`}
                       >
                         {key.is_active ? 'Disable' : 'Enable'}
                       </button>
                       <button 
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(key)}
+                        aria-label={`Delete API key ${key.name}`}
                       >
                         Delete
                       </button>
@@ -347,22 +379,46 @@ const ApiKeysPage: React.FC = () => {
             </table>
           </div>
         )}
-      </div>
+      </section>
       
       {/* Confirmation Modal */}
       {confirmModal && (
-        <div className="modal-backdrop">
+        <div 
+          className="modal-backdrop" 
+          role="dialog" 
+          aria-modal="true" 
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+        >
           <div className="modal">
             <div className="modal-header">
-              <h3>{confirmModal.title}</h3>
-              <button className="modal-close" onClick={confirmModal.onCancel}>&times;</button>
+              <h3 id="modal-title">{confirmModal.title}</h3>
+              <button 
+                className="modal-close" 
+                onClick={confirmModal.onCancel}
+                aria-label="Close dialog"
+              >
+                &times;
+              </button>
             </div>
             <div className="modal-body">
-              <p>{confirmModal.message}</p>
+              <p id="modal-description">{confirmModal.message}</p>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={confirmModal.onCancel}>Cancel</button>
-              <button className="btn btn-danger" onClick={confirmModal.onConfirm}>Delete</button>
+              <button 
+                className="btn btn-secondary" 
+                onClick={confirmModal.onCancel}
+                autoFocus
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-danger" 
+                onClick={confirmModal.onConfirm}
+                aria-describedby="modal-description"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

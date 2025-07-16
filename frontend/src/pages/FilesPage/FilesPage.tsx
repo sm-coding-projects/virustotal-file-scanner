@@ -43,8 +43,8 @@ const FilesPage: React.FC = () => {
   };
 
   // Handle file deletion
-  const handleDeleteFile = async (fileId: string) => {
-    if (window.confirm('Are you sure you want to delete this file?')) {
+  const handleDeleteFile = async (fileId: string, filename: string) => {
+    if (window.confirm(`Are you sure you want to delete "${filename}"? This action cannot be undone.`)) {
       try {
         await deleteFile(fileId);
         // Refresh the file list
@@ -111,42 +111,60 @@ const FilesPage: React.FC = () => {
         </div>
       </div>
       
-      <div className="uploaded-files">
-        <h2>Uploaded Files</h2>
+      <section className="uploaded-files" aria-labelledby="uploaded-files-heading">
+        <h2 id="uploaded-files-heading">Uploaded Files</h2>
         
         {loading ? (
-          <p>Loading files...</p>
+          <div className="loading-spinner" role="status" aria-live="polite">
+            <span className="sr-only">Loading files...</span>
+            Loading files...
+          </div>
         ) : files.length === 0 ? (
-          <p>No files uploaded yet.</p>
+          <div className="empty-state" role="status">
+            <p>No files uploaded yet. Use the upload form above to get started.</p>
+          </div>
         ) : (
           <div className="files-table-container">
-            <table className="table">
+            <div className="sr-only" aria-live="polite">
+              {files.length} file{files.length !== 1 ? 's' : ''} uploaded
+            </div>
+            <table className="table" role="table" aria-label="Uploaded files">
               <thead>
                 <tr>
-                  <th>Filename</th>
-                  <th className="mobile-hidden">Size</th>
-                  <th className="mobile-hidden">Upload Date</th>
-                  <th className="mobile-hidden">Hash (SHA-256)</th>
-                  <th>Actions</th>
+                  <th scope="col">Filename</th>
+                  <th scope="col" className="mobile-hidden">Size</th>
+                  <th scope="col" className="mobile-hidden">Upload Date</th>
+                  <th scope="col" className="mobile-hidden">Hash (SHA-256)</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {files.map(file => (
                   <tr key={file.id}>
-                    <td>{file.filename}</td>
+                    <th scope="row">{file.filename}</th>
                     <td className="mobile-hidden">{formatFileSize(file.file_size)}</td>
-                    <td className="mobile-hidden">{formatDate(file.upload_date)}</td>
                     <td className="mobile-hidden">
-                      <span className="hash-value" title={file.hash_sha256}>
+                      <time dateTime={file.upload_date}>
+                        {formatDate(file.upload_date)}
+                      </time>
+                    </td>
+                    <td className="mobile-hidden">
+                      <span 
+                        className="hash-value" 
+                        title={`Full SHA-256 hash: ${file.hash_sha256}`}
+                        aria-label={`SHA-256 hash starting with ${file.hash_sha256.substring(0, 8)}`}
+                      >
                         {file.hash_sha256.substring(0, 8)}...
                       </span>
                     </td>
                     <td>
-                      <div className="file-actions">
+                      <div className="file-actions" role="group" aria-label={`Actions for ${file.filename}`}>
                         <button 
                           className="btn btn-primary"
                           onClick={() => handleScanFile(file.id)}
                           disabled={scanningFiles.has(file.id)}
+                          aria-busy={scanningFiles.has(file.id)}
+                          aria-label={`${scanningFiles.has(file.id) ? 'Scanning' : 'Scan'} ${file.filename}`}
                         >
                           {scanningFiles.has(file.id) ? 'Scanning...' : 'Scan'}
                         </button>
@@ -159,8 +177,9 @@ const FilesPage: React.FC = () => {
                         </button>
                         <button 
                           className="btn btn-danger"
-                          onClick={() => handleDeleteFile(file.id)}
+                          onClick={() => handleDeleteFile(file.id, file.filename)}
                           disabled={scanningFiles.has(file.id)}
+                          aria-label={`Delete ${file.filename}`}
                         >
                           Delete
                         </button>
@@ -172,7 +191,7 @@ const FilesPage: React.FC = () => {
             </table>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 };

@@ -4,6 +4,24 @@
   min-height: 100vh;
 }
 
+/* Skip link for screen readers and keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 1000;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 .main-content {
   flex: 1;
   padding: 2rem 0;

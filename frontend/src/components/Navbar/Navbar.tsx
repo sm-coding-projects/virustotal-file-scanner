@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" role="navigation" aria-label="Main navigation">
       <div className="container navbar-container">
         <div className="navbar-top">
           <Link to="/" className="navbar-brand" onClick={closeMenu}>
@@ -53,25 +53,38 @@ const Navbar: React.FC = () => {
             aria-label="Toggle navigation menu"
             onClick={toggleMenu}
             aria-expanded={menuOpen}
+            aria-controls="navbar-menu"
+            type="button"
           >
-            <span className="navbar-toggle-icon"></span>
+            <span className="navbar-toggle-icon" aria-hidden="true"></span>
           </button>
         </div>
-        <div className={`navbar-menu ${menuOpen ? 'navbar-menu-open' : ''}`}>
+        <div 
+          id="navbar-menu"
+          className={`navbar-menu ${menuOpen ? 'navbar-menu-open' : ''}`}
+          role="menubar"
+          aria-hidden={!menuOpen}
+        >
           {isAuthenticated ? (
             <>
-              <Link to="/" className="navbar-item" onClick={closeMenu}>Home</Link>
-              <Link to="/api-keys" className="navbar-item" onClick={closeMenu}>API Keys</Link>
-              <Link to="/files" className="navbar-item" onClick={closeMenu}>Files</Link>
-              <Link to="/scan-results" className="navbar-item" onClick={closeMenu}>Scan Results</Link>
-              <button onClick={handleLogout} className="navbar-item logout-button">
-                Logout
+              <Link to="/" className="navbar-item" onClick={closeMenu} role="menuitem">Home</Link>
+              <Link to="/api-keys" className="navbar-item" onClick={closeMenu} role="menuitem">API Keys</Link>
+              <Link to="/files" className="navbar-item" onClick={closeMenu} role="menuitem">Files</Link>
+              <Link to="/scan-results" className="navbar-item" onClick={closeMenu} role="menuitem">Scan Results</Link>
+              <button 
+                onClick={handleLogout} 
+                className="navbar-item logout-button"
+                role="menuitem"
+                aria-busy={isLoggingOut}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="navbar-item" onClick={closeMenu}>Login</Link>
-              <Link to="/register" className="navbar-item" onClick={closeMenu}>Register</Link>
+              <Link to="/login" className="navbar-item" onClick={closeMenu} role="menuitem">Login</Link>
+              <Link to="/register" className="navbar-item" onClick={closeMenu} role="menuitem">Register</Link>
             </>
           )}
         </div>

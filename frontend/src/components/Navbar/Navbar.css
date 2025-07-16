@@ -43,7 +43,8 @@
 }
 
 .navbar-toggle:focus {
-  outline: none;
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
 }
 
 .navbar-toggle-icon {
@@ -101,10 +102,18 @@
   transition: color 0.3s ease;
   padding: 0.5rem 0;
   position: relative;
+  border-radius: 4px;
 }
 
-.navbar-item:hover {
+.navbar-item:hover,
+.navbar-item:focus {
   color: var(--secondary-color);
+  outline: none;
+}
+
+.navbar-item:focus {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
 }
 
 .navbar-item:after {
@@ -118,7 +127,8 @@
   transition: width 0.3s ease;
 }
 
-.navbar-item:hover:after {
+.navbar-item:hover:after,
+.navbar-item:focus:after {
   width: 100%;
 }
 

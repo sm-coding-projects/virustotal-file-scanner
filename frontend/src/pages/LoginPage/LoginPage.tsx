@@ -58,16 +58,16 @@ const LoginPage: React.FC = () => {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h2>Login</h2>
+        <h1>Login</h1>
         <p className="auth-description">Sign in to your account to access the VirusTotal File Scanner</p>
         
         {error && (
-          <div className="error-message">
+          <div className="error-message" role="alert" aria-live="polite">
             {error}
           </div>
         )}
         
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="username">Username or Email</label>
             <input 
@@ -79,6 +79,9 @@ const LoginPage: React.FC = () => {
               onChange={handleChange}
               required
               disabled={isLoading}
+              aria-describedby={error ? "login-error" : undefined}
+              aria-invalid={error ? "true" : "false"}
+              autoComplete="username"
             />
           </div>
           
@@ -93,6 +96,9 @@ const LoginPage: React.FC = () => {
               onChange={handleChange}
               required
               disabled={isLoading}
+              aria-describedby={error ? "login-error" : undefined}
+              aria-invalid={error ? "true" : "false"}
+              autoComplete="current-password"
             />
           </div>
           
@@ -100,14 +106,26 @@ const LoginPage: React.FC = () => {
             type="submit" 
             className="btn btn-primary btn-block"
             disabled={isLoading}
+            aria-busy={isLoading}
+            aria-describedby="login-status"
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
+          
+          <div id="login-status" className="sr-only" aria-live="polite">
+            {isLoading ? 'Logging in, please wait...' : ''}
+          </div>
+          
+          {error && (
+            <div id="login-error" className="sr-only">
+              Login error: {error}
+            </div>
+          )}
         </form>
         
         <div className="auth-footer">
           <p>
-            Don't have an account? <Link to="/register">Register</Link>
+            Don't have an account? <Link to="/register" aria-label="Go to registration page">Register</Link>
           </p>
         </div>
       </div>

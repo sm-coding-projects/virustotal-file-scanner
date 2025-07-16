@@ -100,16 +100,16 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h2>Register</h2>
+        <h1>Register</h1>
         <p className="auth-description">Create a new account to use the VirusTotal File Scanner</p>
         
         {error && (
-          <div className="error-message">
+          <div className="error-message" role="alert" aria-live="polite">
             {error}
           </div>
         )}
         
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input 
@@ -121,7 +121,13 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               required
               disabled={isLoading}
+              aria-describedby={error ? "register-error" : "username-help"}
+              aria-invalid={error ? "true" : "false"}
+              autoComplete="username"
             />
+            <div id="username-help" className="form-text">
+              Choose a unique username for your account
+            </div>
           </div>
           
           <div className="form-group">
@@ -135,7 +141,13 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               required
               disabled={isLoading}
+              aria-describedby={error ? "register-error" : "email-help"}
+              aria-invalid={error ? "true" : "false"}
+              autoComplete="email"
             />
+            <div id="email-help" className="form-text">
+              We'll use this email for account verification and notifications
+            </div>
           </div>
           
           <div className="form-group">
@@ -150,7 +162,13 @@ const RegisterPage: React.FC = () => {
               required
               disabled={isLoading}
               minLength={8}
+              aria-describedby={error ? "register-error" : "password-help"}
+              aria-invalid={error ? "true" : "false"}
+              autoComplete="new-password"
             />
+            <div id="password-help" className="form-text">
+              Password must be at least 8 characters long
+            </div>
           </div>
           
           <div className="form-group">
@@ -164,21 +182,39 @@ const RegisterPage: React.FC = () => {
               onChange={handleChange}
               required
               disabled={isLoading}
+              aria-describedby={error ? "register-error" : "confirm-password-help"}
+              aria-invalid={error ? "true" : "false"}
+              autoComplete="new-password"
             />
+            <div id="confirm-password-help" className="form-text">
+              Re-enter your password to confirm
+            </div>
           </div>
           
           <button 
             type="submit" 
             className="btn btn-primary btn-block"
             disabled={isLoading}
+            aria-busy={isLoading}
+            aria-describedby="register-status"
           >
             {isLoading ? 'Registering...' : 'Register'}
           </button>
+          
+          <div id="register-status" className="sr-only" aria-live="polite">
+            {isLoading ? 'Creating account, please wait...' : ''}
+          </div>
+          
+          {error && (
+            <div id="register-error" className="sr-only">
+              Registration error: {error}
+            </div>
+          )}
         </form>
         
         <div className="auth-footer">
           <p>
-            Already have an account? <Link to="/login">Login</Link>
+            Already have an account? <Link to="/login" aria-label="Go to login page">Login</Link>
           </p>
         </div>
       </div>

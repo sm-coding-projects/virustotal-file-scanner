@@ -12,9 +12,15 @@ import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import AuthCheck from './components/AuthCheck/AuthCheck';
 import ViewportMeta from './components/ViewportMeta/ViewportMeta';
 import { useAuthStore } from './store/authStore';
+import { addFocusVisiblePolyfill } from './utils/accessibilityHelpers';
 
 const App: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
+
+  // Initialize accessibility features
+  useEffect(() => {
+    addFocusVisiblePolyfill();
+  }, []);
 
   return (
     <Router>
