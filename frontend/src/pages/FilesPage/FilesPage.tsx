@@ -153,6 +153,7 @@ const FilesPage: React.FC = () => {
                         <button 
                           className="btn btn-success"
                           onClick={() => window.location.href = `/scan-results/${file.id}`}
+                          aria-label={`View scan results for ${file.filename}`}
                         >
                           Results
                         </button>
