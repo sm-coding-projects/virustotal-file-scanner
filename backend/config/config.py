@@ -45,6 +45,7 @@ class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    LOG_FILE = 'tests_app.log'  # Use a local file in the current directory
     
 
 class ProductionConfig(Config):

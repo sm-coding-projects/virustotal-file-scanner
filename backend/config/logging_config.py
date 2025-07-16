@@ -18,8 +18,12 @@ def configure_logging(app: Flask) -> None:
     
     # Ensure log directory exists
     log_dir = os.path.dirname(log_file)
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir, exist_ok=True)
+    if log_dir and not os.path.exists(log_dir):
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+        except OSError:
+            # Fall back to current directory if we can't create the log directory
+            log_file = os.path.basename(log_file)
     
     # Configure root logger
     logging.basicConfig(

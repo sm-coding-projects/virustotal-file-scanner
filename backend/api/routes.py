@@ -3,10 +3,10 @@ API routes configuration for the VirusTotal File Scanner application.
 """
 from flask import Flask, Blueprint
 from backend.api.auth import auth_bp
+from backend.api.keys import keys_bp
 
 # Create blueprints for different API sections
 main_bp = Blueprint('main', __name__)
-keys_bp = Blueprint('keys', __name__, url_prefix='/api/keys')
 files_bp = Blueprint('files', __name__, url_prefix='/api/files')
 scan_bp = Blueprint('scan', __name__, url_prefix='/api/scan')
 
