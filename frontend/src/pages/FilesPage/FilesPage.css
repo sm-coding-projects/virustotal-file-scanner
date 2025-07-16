@@ -264,3 +264,263 @@
   cursor: pointer;
   font-size: 1.2rem;
 }
+
+/* Tablet styles */
+@media (max-width: 1024px) {
+  .files-page {
+    padding: 15px;
+  }
+  
+  .file-drop-zone {
+    padding: 25px;
+  }
+  
+  .file-icon {
+    font-size: 2.5rem;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .files-page {
+    padding: 10px;
+  }
+  
+  .page-description {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  
+  .card {
+    margin-bottom: 20px;
+  }
+  
+  .card-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .file-drop-zone {
+    padding: 20px 15px;
+    margin-bottom: 15px;
+  }
+  
+  .file-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  
+  .file-drop-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  .file-drop-content p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+  
+  .upload-info {
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+  }
+  
+  .upload-button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+  
+  /* File list responsive */
+  .files-table-container {
+    margin: 0 -10px;
+    padding: 0 10px;
+  }
+  
+  .table {
+    font-size: 0.85rem;
+    min-width: 600px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 8px 6px;
+  }
+  
+  .table th:first-child,
+  .table td:first-child {
+    padding-left: 10px;
+  }
+  
+  .table th:last-child,
+  .table td:last-child {
+    padding-right: 10px;
+  }
+  
+  .file-actions {
+    flex-direction: column;
+    gap: 5px;
+    min-width: 80px;
+  }
+  
+  .file-actions .btn {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+  
+  /* File preview responsive */
+  .file-preview {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .file-preview-icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+  }
+  
+  .file-preview-name {
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+  }
+  
+  .file-preview-size {
+    font-size: 0.8rem;
+  }
+  
+  .file-preview-remove {
+    font-size: 1rem;
+  }
+  
+  /* File item responsive */
+  .file-item {
+    padding: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .file-name {
+    font-size: 0.9rem;
+    word-break: break-word;
+    margin-bottom: 5px;
+  }
+  
+  .file-size {
+    font-size: 0.8rem;
+    margin-right: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .file-progress {
+    height: 4px;
+    margin-top: 3px;
+  }
+  
+  .file-validation-error,
+  .file-validation-success {
+    font-size: 0.8rem;
+    margin-top: 3px;
+  }
+}
+
+/* Small mobile styles */
+@media (max-width: 480px) {
+  .files-page {
+    padding: 8px;
+  }
+  
+  .card-header {
+    padding: 12px 15px;
+  }
+  
+  .card-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .card-body {
+    padding: 12px;
+  }
+  
+  .file-drop-zone {
+    padding: 15px 10px;
+  }
+  
+  .file-icon {
+    font-size: 1.8rem;
+  }
+  
+  .file-drop-content h3 {
+    font-size: 1rem;
+  }
+  
+  .file-drop-content p {
+    font-size: 0.85rem;
+  }
+  
+  .upload-info {
+    font-size: 0.8rem;
+  }
+  
+  .table {
+    font-size: 0.8rem;
+    min-width: 500px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 6px 4px;
+  }
+  
+  .file-actions .btn {
+    font-size: 0.75rem;
+    padding: 4px 6px;
+  }
+  
+  .file-preview {
+    padding: 6px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .file-preview-icon {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+  
+  .file-preview-info {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .file-preview-remove {
+    align-self: flex-end;
+  }
+  
+  /* Hide less important table columns on very small screens */
+  .table .mobile-hidden {
+    display: none;
+  }
+  
+  .file-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .file-size {
+    margin-right: 0;
+    order: 2;
+  }
+  
+  .file-name {
+    order: 1;
+    width: 100%;
+  }
+  
+  .file-progress {
+    order: 3;
+    width: 100%;
+  }
+}

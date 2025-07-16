@@ -177,10 +177,103 @@ body {
   .d-none-mobile {
     display: none !important;
   }
+  
+  .text-center-mobile {
+    text-align: center !important;
+  }
+  
+  .w-100-mobile {
+    width: 100% !important;
+  }
+  
+  .mt-2-mobile {
+    margin-top: 0.5rem !important;
+  }
+  
+  .mb-2-mobile {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .p-1-mobile {
+    padding: 0.25rem !important;
+  }
+  
+  .flex-column-mobile {
+    flex-direction: column !important;
+  }
+  
+  .gap-sm-mobile {
+    gap: 0.5rem !important;
+  }
+  
+  .text-left-mobile {
+    text-align: left !important;
+  }
+  
+  .px-2-mobile {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  .py-2-mobile {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  .mx-auto-mobile {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  .overflow-auto-mobile {
+    overflow: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .d-none-small {
+    display: none !important;
+  }
+  
+  .text-sm-mobile {
+    font-size: 0.85rem !important;
+  }
+  
+  .text-xs-mobile {
+    font-size: 0.75rem !important;
+  }
+  
+  .p-1-small {
+    padding: 0.25rem !important;
+  }
+  
+  .gap-xs-small {
+    gap: 0.25rem !important;
+  }
 }
 
 @media (min-width: 769px) {
   .d-none-desktop {
     display: none !important;
+  }
+}
+
+/* Enhanced responsive container */
+@media (max-width: 1200px) {
+  .container {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
   }
 }

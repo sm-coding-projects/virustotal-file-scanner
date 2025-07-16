@@ -10,6 +10,7 @@ import FilesPage from './pages/FilesPage/FilesPage';
 import ScanResultsPage from './pages/ScanResultsPage/ScanResultsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import AuthCheck from './components/AuthCheck/AuthCheck';
+import ViewportMeta from './components/ViewportMeta/ViewportMeta';
 import { useAuthStore } from './store/authStore';
 
 const App: React.FC = () => {
@@ -17,6 +18,8 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      {/* ViewportMeta component adds proper mobile viewport settings */}
+      <ViewportMeta />
       {/* AuthCheck component verifies authentication status on app load */}
       <AuthCheck />
       <Routes>

@@ -105,10 +105,17 @@ const ScanResultsPage: React.FC = () => {
     setSortConfig({ key, direction });
     
     const sortedResults = [...filteredResults].sort((a, b) => {
-      if (a[key as keyof ScanResult] < b[key as keyof ScanResult]) {
+      const aValue = a[key as keyof ScanResult];
+      const bValue = b[key as keyof ScanResult];
+      
+      if (aValue == null || bValue == null) {
+        return 0;
+      }
+      
+      if (aValue < bValue) {
         return direction === 'asc' ? -1 : 1;
       }
-      if (a[key as keyof ScanResult] > b[key as keyof ScanResult]) {
+      if (aValue > bValue) {
         return direction === 'asc' ? 1 : -1;
       }
       return 0;
@@ -145,11 +152,11 @@ const ScanResultsPage: React.FC = () => {
       results = results.filter(result => {
         if (filters.status === 'clean') {
           return result.detection_ratio === '0/0' || 
-                 (result.summary?.stats.malicious === 0 && result.summary?.stats.suspicious === 0);
+                 (result.summary?.stats?.malicious === 0 && result.summary?.stats?.suspicious === 0);
         } else if (filters.status === 'malicious') {
-          return result.summary?.stats.malicious > 0;
+          return (result.summary?.stats?.malicious || 0) > 0;
         } else if (filters.status === 'suspicious') {
-          return result.summary?.stats.suspicious > 0 && result.summary?.stats.malicious === 0;
+          return (result.summary?.stats?.suspicious || 0) > 0 && (result.summary?.stats?.malicious || 0) === 0;
         }
         return true;
       });
@@ -373,27 +380,29 @@ const ScanResultsPage: React.FC = () => {
               />
             </div>
             
-            <button 
-              className="btn btn-primary"
-              onClick={applyFilters}
-            >
-              Apply Filters
-            </button>
-            
-            <button 
-              className="btn btn-secondary"
-              onClick={resetFilters}
-            >
-              Reset Filters
-            </button>
-            
-            <button 
-              className="btn btn-secondary"
-              onClick={() => setShowExportModal(true)}
-              disabled={filteredResults.length === 0}
-            >
-              Export Results
-            </button>
+            <div className="filter-buttons">
+              <button 
+                className="btn btn-primary"
+                onClick={applyFilters}
+              >
+                Apply Filters
+              </button>
+              
+              <button 
+                className="btn btn-secondary"
+                onClick={resetFilters}
+              >
+                Reset Filters
+              </button>
+              
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowExportModal(true)}
+                disabled={filteredResults.length === 0}
+              >
+                Export Results
+              </button>
+            </div>
           </div>
           
           <div className="results-table-container">
@@ -408,7 +417,7 @@ const ScanResultsPage: React.FC = () => {
                     <th onClick={() => handleSort('filename')}>
                       Filename <span className="sort-icon">{getSortIcon('filename')}</span>
                     </th>
-                    <th onClick={() => handleSort('scan_date')}>
+                    <th onClick={() => handleSort('scan_date')} className="mobile-hidden">
                       Scan Date <span className="sort-icon">{getSortIcon('scan_date')}</span>
                     </th>
                     <th onClick={() => handleSort('detection_ratio')}>
@@ -422,7 +431,7 @@ const ScanResultsPage: React.FC = () => {
                   {displayedResults.map((result) => (
                     <tr key={result.scan_id}>
                       <td>{result.filename}</td>
-                      <td>{formatDate(result.scan_date)}</td>
+                      <td className="mobile-hidden">{formatDate(result.scan_date)}</td>
                       <td>{result.detection_ratio}</td>
                       <td>
                         <span className={`status-badge ${getStatusBadgeClass(result)}`}>
@@ -534,28 +543,30 @@ const ScanResultsPage: React.FC = () => {
             {selectedScan.results && selectedScan.results.length > 0 && (
               <div className="scan-details-section">
                 <h3>Detection Details</h3>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Engine</th>
-                      <th>Version</th>
-                      <th>Result</th>
-                      <th>Category</th>
-                      <th>Update Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedScan.results.map((result, index) => (
-                      <tr key={index}>
-                        <td>{result.engine_name}</td>
-                        <td>{result.engine_version}</td>
-                        <td>{result.result || 'Clean'}</td>
-                        <td>{result.category}</td>
-                        <td>{formatDate(result.update_date)}</td>
+                <div className="detection-table-container">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Engine</th>
+                        <th className="mobile-hidden">Version</th>
+                        <th>Result</th>
+                        <th className="mobile-hidden">Category</th>
+                        <th className="mobile-hidden">Update Date</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedScan.results.map((result, index) => (
+                        <tr key={index}>
+                          <td>{result.engine_name}</td>
+                          <td className="mobile-hidden">{result.engine_version}</td>
+                          <td>{result.result || 'Clean'}</td>
+                          <td className="mobile-hidden">{result.category}</td>
+                          <td className="mobile-hidden">{formatDate(result.update_date)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>

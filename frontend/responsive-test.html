@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Test - VirusTotal File Scanner</title>
+    <style>
+        /* Import the main CSS styles */
+        @import url('./src/App.css');
+        @import url('./src/components/Navbar/Navbar.css');
+        @import url('./src/pages/HomePage/HomePage.css');
+        @import url('./src/pages/ApiKeysPage/ApiKeysPage.css');
+        @import url('./src/pages/FilesPage/FilesPage.css');
+        @import url('./src/pages/ScanResultsPage/ScanResultsPage.css');
+        @import url('./src/pages/LoginPage/LoginPage.css');
+        @import url('./src/components/Layout/Layout.css');
+        
+        /* Test styles */
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-title {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .device-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        /* Show different indicators based on screen size */
+        .device-indicator::after {
+            content: "Desktop";
+        }
+        
+        @media (max-width: 1024px) {
+            .device-indicator::after {
+                content: "Tablet";
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .device-indicator::after {
+                content: "Mobile";
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .device-indicator::after {
+                content: "Small Mobile";
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="device-indicator"></div>
+    
+    <div class="app-container">
+        <!-- Navbar Test -->
+        <nav class="navbar">
+            <div class="container navbar-container">
+                <div class="navbar-top">
+                    <a href="#" class="navbar-brand">VirusTotal File Scanner</a>
+                    <button class="navbar-toggle">
+                        <span class="navbar-toggle-icon"></span>
+                    </button>
+                </div>
+                <div class="navbar-menu">
+                    <a href="#" class="navbar-item">Home</a>
+                    <a href="#" class="navbar-item">API Keys</a>
+                    <a href="#" class="navbar-item">Files</a>
+                    <a href="#" class="navbar-item">Scan Results</a>
+                    <button class="navbar-item logout-button">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Home Page Test -->
+                <div class="test-section">
+                    <h2 class="test-title">Home Page Responsive Test</h2>
+                    <div class="home-page">
+                        <div class="welcome-section">
+                            <h1>Welcome to VirusTotal File Scanner</h1>
+                            <p>This application allows you to scan files for malicious content using the VirusTotal API.</p>
+                        </div>
+                        <div class="features-section">
+                            <div class="feature-card">
+                                <h2>API Key Management</h2>
+                                <p>Add and manage your VirusTotal API keys securely.</p>
+                                <a href="#" class="btn btn-primary">Manage API Keys</a>
+                            </div>
+                            <div class="feature-card">
+                                <h2>File Upload</h2>
+                                <p>Upload files to scan them for malicious content.</p>
+                                <a href="#" class="btn btn-primary">Upload Files</a>
+                            </div>
+                            <div class="feature-card">
+                                <h2>Scan Results</h2>
+                                <p>View and analyze the results of your file scans.</p>
+                                <a href="#" class="btn btn-primary">View Results</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Responsive Test -->
+                <div class="test-section">
+                    <h2 class="test-title">Table Responsive Test</h2>
+                    <div class="api-key-table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Key (masked)</th>
+                                    <th>Status</th>
+                                    <th class="mobile-hidden">Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Production Key</td>
+                                    <td class="key-masked">abcd...xyz1</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td class="mobile-hidden">2024-01-15</td>
+                                    <td class="actions-cell">
+                                        <button class="btn btn-sm btn-secondary">Edit</button>
+                                        <button class="btn btn-sm btn-secondary">Disable</button>
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Development Key</td>
+                                    <td class="key-masked">efgh...xyz2</td>
+                                    <td><span class="badge badge-danger">Inactive</span></td>
+                                    <td class="mobile-hidden">2024-01-10</td>
+                                    <td class="actions-cell">
+                                        <button class="btn btn-sm btn-secondary">Edit</button>
+                                        <button class="btn btn-sm btn-secondary">Enable</button>
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Form Responsive Test -->
+                <div class="test-section">
+                    <h2 class="test-title">Form Responsive Test</h2>
+                    <div class="auth-card">
+                        <h2>Login Form</h2>
+                        <p class="auth-description">Enter your credentials to access the application.</p>
+                        <form class="auth-form">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" class="form-control" placeholder="Enter your username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" class="form-control" placeholder="Enter your password">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- File Upload Responsive Test -->
+                <div class="test-section">
+                    <h2 class="test-title">File Upload Responsive Test</h2>
+                    <div class="file-drop-zone">
+                        <div class="file-drop-content">
+                            <i class="file-icon">📁</i>
+                            <h3>Drag and drop files here, or click to select files</h3>
+                            <p>Maximum file size: 32 MB</p>
+                        </div>
+                    </div>
+                    <div class="upload-info">
+                        <p>Supported file types: All</p>
+                    </div>
+                    <button class="btn btn-primary upload-button">Upload and Scan</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 VirusTotal File Scanner</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Simple script to test mobile menu toggle
+        document.querySelector('.navbar-toggle').addEventListener('click', function() {
+            const menu = document.querySelector('.navbar-menu');
+            menu.classList.toggle('navbar-menu-open');
+            this.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

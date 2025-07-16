@@ -124,9 +124,9 @@ const FilesPage: React.FC = () => {
               <thead>
                 <tr>
                   <th>Filename</th>
-                  <th>Size</th>
-                  <th>Upload Date</th>
-                  <th>Hash (SHA-256)</th>
+                  <th className="mobile-hidden">Size</th>
+                  <th className="mobile-hidden">Upload Date</th>
+                  <th className="mobile-hidden">Hash (SHA-256)</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -134,9 +134,9 @@ const FilesPage: React.FC = () => {
                 {files.map(file => (
                   <tr key={file.id}>
                     <td>{file.filename}</td>
-                    <td>{formatFileSize(file.file_size)}</td>
-                    <td>{formatDate(file.upload_date)}</td>
-                    <td>
+                    <td className="mobile-hidden">{formatFileSize(file.file_size)}</td>
+                    <td className="mobile-hidden">{formatDate(file.upload_date)}</td>
+                    <td className="mobile-hidden">
                       <span className="hash-value" title={file.hash_sha256}>
                         {file.hash_sha256.substring(0, 8)}...
                       </span>

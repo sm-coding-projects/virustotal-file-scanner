@@ -306,7 +306,7 @@ const ApiKeysPage: React.FC = () => {
                   <th>Name</th>
                   <th>Key (masked)</th>
                   <th>Status</th>
-                  <th>Created</th>
+                  <th className="mobile-hidden">Created</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -320,7 +320,7 @@ const ApiKeysPage: React.FC = () => {
                         {key.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td>{new Date(key.created_at).toLocaleDateString()}</td>
+                    <td className="mobile-hidden">{new Date(key.created_at).toLocaleDateString()}</td>
                     <td className="actions-cell">
                       <button 
                         className="btn btn-sm btn-secondary"
