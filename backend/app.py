@@ -4,6 +4,7 @@ Main Flask application module for VirusTotal File Scanner.
 import os
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from backend.config.config import Config
 from backend.config.logging_config import configure_logging
 from backend.api.routes import register_blueprints
@@ -26,6 +27,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     CORS(app)
+    jwt = JWTManager(app)
     
     # Configure logging
     configure_logging(app)
