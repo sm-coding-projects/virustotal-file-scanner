@@ -5,8 +5,8 @@ import re
 import html
 import functools
 import time
+import hmac
 from flask import request, jsonify, current_app
-from werkzeug.security import safe_str_cmp
 
 # Dictionary to store rate limiting information
 # Structure: {ip_address: {'count': request_count, 'reset_time': reset_timestamp}}
@@ -75,6 +75,9 @@ def validate_uuid(uuid_str):
     Returns:
         Boolean indicating if the string is a valid UUID
     """
+    if not isinstance(uuid_str, str):
+        return False
+    
     uuid_pattern = re.compile(
         r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
         re.IGNORECASE
