@@ -272,4 +272,3 @@ describe('ApiKeysPage Component', () => {
     });
   });
 });
-</text>
