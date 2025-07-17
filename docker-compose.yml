@@ -8,13 +8,15 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/virustotal_scanner
       - SECRET_KEY=${SECRET_KEY}
       - FLASK_ENV=${FLASK_ENV:-production}
       - UPLOAD_FOLDER=/app/uploads
       - MAX_CONTENT_LENGTH=50000000  # 50MB max upload size
+      - TZ=UTC
     volumes:
       - uploads:/app/uploads
     restart: unless-stopped
@@ -24,6 +26,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - app_network
 
   db:
     build:
@@ -33,6 +47,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=virustotal_scanner
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - TZ=UTC
     volumes:
       - db_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -42,6 +58,18 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - app_network
 
 volumes:
   # Volume for database data - ensures data persistence across container restarts
@@ -61,5 +89,5 @@ volumes:
       o: bind
 
 networks:
-  default:
+  app_network:
     driver: bridge

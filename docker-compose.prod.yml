@@ -1,0 +1,75 @@
+version: '3.8'
+
+# Production override for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  webapp:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    environment:
+      - FLASK_ENV=production
+      - GUNICORN_WORKERS=8
+      - GUNICORN_THREADS=2
+      - LOG_LEVEL=WARNING
+
+  db:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    volumes:
+      - db_backup:/var/lib/postgresql/backup
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=virustotal_scanner
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_INITDB_ARGS=--data-checksums
+
+  # Add a backup service for production
+  backup:
+    image: postgres:14-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data:ro
+      - db_backup:/backup
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command: |
+      sh -c 'while true; do
+        DATE=$$(date +%Y%m%d_%H%M%S);
+        pg_dump -h db -U postgres -d virustotal_scanner -f /backup/virustotal_scanner_$$DATE.sql;
+        find /backup -name "*.sql" -type f -mtime +7 -delete;
+        sleep 86400;
+      done'
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  db_backup:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/backups
+      o: bind

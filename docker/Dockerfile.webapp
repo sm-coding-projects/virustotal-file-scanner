@@ -7,10 +7,12 @@ WORKDIR /app/frontend
 
 # Copy frontend package.json and install dependencies
 COPY frontend/package*.json ./
-RUN npm install
+# Use npm ci for more reliable builds
+RUN npm ci --production
 
 # Copy frontend source code and build
 COPY frontend/ ./
+# Build with production optimization
 RUN npm run build
 
 # Stage 2: Build the backend
@@ -33,9 +35,10 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install Nginx and other dependencies
+# Install Nginx, curl (for health checks), and other dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
+    curl \
     gunicorn \
     && rm -rf /var/lib/apt/lists/*
 
@@ -50,13 +53,19 @@ COPY --from=frontend-builder /app/frontend/build /app/frontend/build
 # Copy Nginx configuration
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
-# Create directory for uploaded files
-RUN mkdir -p /app/uploads && chmod 777 /app/uploads
+# Create directory for uploaded files with appropriate permissions
+RUN mkdir -p /app/uploads && chmod 750 /app/uploads
 
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV FLASK_APP=backend/app.py
 ENV FLASK_ENV=production
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Create a non-root user to run the application
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app/uploads
 
 # Expose port for web access
 EXPOSE 80
@@ -64,6 +73,10 @@ EXPOSE 80
 # Copy startup script
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
+
+# Set health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost/health || exit 1
 
 # Start Nginx and Gunicorn
 CMD ["/start.sh"]
